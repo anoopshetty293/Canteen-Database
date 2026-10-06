@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canteen Counter</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3ECDA;--bg2:#E9DFC6;--card:#FFFBF0;--ink:#232A21;--soft:#667060;--line:#D8CCAE;--gold:#C98A00;--on:#2a1d00;--brick:#B5482E;--good:#3F7A48;--d:'Big Shoulders Display','Arial Narrow',sans-serif;--b:'DM Sans',system-ui,sans-serif;--m:'DM Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#1C221B;--bg2:#252C23;--card:#2D352B;--ink:#F5EEDC;--soft:#A2AC99;--line:#434D3F;--gold:#E8AA1C;--brick:#E0674B;--good:#6DB077}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--b)}
+button,input,select{font:inherit;color:inherit}:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hidden{display:none!important}
+.stripe{height:8px;background:repeating-linear-gradient(90deg,var(--gold) 0 20px,var(--brick) 20px 40px)}
+.btn{background:var(--gold);color:var(--on);border:0;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer}
+.btn.g{background:none;border:1.5px solid var(--line);color:var(--ink);font-weight:500;padding:6px 12px;font-size:.85rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+input,select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg)}
+label{display:block;font-size:.85rem;color:var(--soft);margin-bottom:12px}label input,label select{margin-top:4px}
+/* login */
+#login{min-height:calc(100vh - 8px);display:grid;grid-template-columns:1.1fr 1fr}
+.l-art{background:var(--bg2);padding:clamp(24px,6vw,72px);display:flex;flex-direction:column;justify-content:center}
+h1{font:900 clamp(3.2rem,8vw,6.5rem)/.88 var(--d);margin:0 0 18px;text-transform:uppercase}h1 span{color:var(--brick)}
+.l-art p{color:var(--soft);max-width:44ch;font-size:1.1rem}
+.l-form{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,6vw,72px);max-width:520px}
+.l-form h2{font:800 2rem var(--d);margin:0 0 12px}
+.roles{display:grid;gap:8px;margin-bottom:18px}
+.role{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--card);cursor:pointer;transition:transform .15s,border-color .15s}
+.role:hover{border-color:var(--gold);transform:translateX(4px)}.role b{font:800 1.3rem var(--d)}.role small{color:var(--soft)}
+.err{color:var(--brick);font-size:.9rem;margin:10px 0 0}
+/* shell */
+#app{display:grid;grid-template-columns:84px 1fr;min-height:100vh}
+nav{background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;position:sticky;top:0;height:100vh}
+.logo{font:900 1.1rem var(--d);background:var(--gold);color:var(--on);padding:5px 8px;border-radius:4px;margin-bottom:14px}
+nav button{width:100%;background:none;border:0;color:inherit;opacity:.65;padding:10px 4px;border-radius:8px;cursor:pointer;font-size:.72rem;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button i{font-style:normal;font-size:1.4rem}nav button[aria-current=true]{background:color-mix(in srgb,var(--gold) 28%,transparent);opacity:1}
+nav .sp{flex:1}
+.top{display:flex;gap:12px;align-items:center;padding:16px clamp(16px,3vw,36px);position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px dashed var(--line)}
+.top .q{flex:1;max-width:460px}.top .q input{border-radius:99px;padding-left:18px}
+.pill{font:500 .75rem var(--m);padding:3px 10px;border-radius:99px;background:var(--bg2);border:1px solid var(--line)}
+.wal{font:500 1rem var(--m);background:var(--card);border:1px solid var(--line);padding:6px 14px;border-radius:99px;transition:color .3s}
+.wal.flash{color:var(--brick)}
+.cartbtn{position:relative}.cartbtn b{position:absolute;top:-8px;right:-8px;background:var(--brick);color:#fff;border-radius:99px;font:700 .7rem var(--m);padding:1px 7px}
+main{padding:8px clamp(16px,3vw,36px) 80px}
+h2{font:800 clamp(2rem,4.5vw,3rem)/1 var(--d);margin:22px 0 4px;text-transform:uppercase}.sub{color:var(--soft);margin:0 0 18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1.5px solid var(--line);background:none;border-radius:99px;padding:5px 14px;cursor:pointer;font-size:.88rem}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s}
+.item:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.item .pic{height:84px;display:grid;place-items:center;font-size:2.6rem;background:var(--c)}
+.item .bd{padding:14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.item h3{font:800 1.45rem/1.05 var(--d);margin:0}.item p{margin:0;color:var(--soft);font-size:.86rem;flex:1}
+.item .pr{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font:500 1.05rem var(--m)}
+.step{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:var(--on);border-radius:99px;padding:3px;font:700 .95rem var(--m)}
+.step button{width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.12);cursor:pointer;font-weight:700;color:inherit}
+.step.add{padding:6px 16px;cursor:pointer;border:0;font-family:var(--b)}
+.pop{animation:pop .25s}@keyframes pop{50%{transform:scale(1.15)}}
+/* drawer */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100%);background:var(--card);transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:21;padding:20px;display:flex;flex-direction:column}
+.open #scrim{opacity:1;pointer-events:auto}.open #drawer{transform:none}
+#drawer h3{font:800 2rem var(--d);margin:0 0 8px}
+#lines{flex:1;overflow:auto}.ln{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.recpt{font:.85rem var(--m);display:flex;justify-content:space-between;margin:6px 0}
+/* tables, stats */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th{text-align:left;font:500 .78rem var(--m);color:var(--soft);padding:10px 14px;border-bottom:1.5px solid var(--line)}
+td{padding:9px 14px;border-bottom:1px dashed var(--line);white-space:nowrap}tr:last-child td{border:0}
+td input{width:90px;padding:5px 8px;font-family:var(--m)}
+.sw{position:relative;width:44px;height:24px;display:inline-block}.sw input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.sw span{position:absolute;inset:0;background:var(--line);border-radius:99px;transition:.2s}.sw span:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+span{background:var(--good)}.sw input:checked+span:after{transform:translateX(20px)}.sw input:focus-visible+span{outline:3px solid var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
+.stat{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:14px 16px;cursor:pointer}
+.stat[aria-pressed=true]{border-color:var(--gold)}.stat b{display:block;font:900 2.8rem/1 var(--d)}.stat span{font-size:.82rem;color:var(--soft)}
+.add{display:grid;grid-template-columns:1.2fr 2fr .8fr 1fr auto;gap:10px;align-items:end;margin-bottom:18px}.add label{margin:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:6px;font-weight:500;z-index:30}.toast.bad{background:var(--brick);color:#fff}
+@media(max-width:820px){#login{grid-template-columns:1fr}.add{grid-template-columns:1fr 1fr}#app{grid-template-columns:1fr}nav{flex-direction:row;height:auto;position:fixed;bottom:0;left:0;right:0;top:auto;z-index:10;justify-content:center}nav .logo,nav .sp{display:none}nav button{width:auto;padding:8px 18px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head>
+<body>
+<div class="stripe"></div>
+<section id="login">
+  <div class="l-art"><h1>Skip the queue.<br><span>Eat the samosa.</span></h1><p>One login table, three roles, and a wallet that can never go negative. Pick a role to walk the counter.</p></div>
+  <div class="l-form"><h2>Punch in</h2><div class="roles" id="roles"></div>
+    <form id="lf"><label>Username<input id="lu" autocomplete="username" required></label><label>Password<input id="lp" type="password" autocomplete="current-password" required></label>
+    <button class="btn">Log in</button><p class="err hidden" id="le" role="alert"></p></form></div>
+</section>
+
+<div id="app" class="hidden">
+  <nav id="nav"></nav>
+  <div>
+    <div class="top"><div class="q"><input id="q" type="search" placeholder="Search…" aria-label="Search"></div><span style="flex:1"></span>
+      <span class="wal hidden" id="wal"></span><button class="btn g cartbtn hidden" id="cb">Ticket<b id="cc">0</b></button><span class="pill" id="who"></span></div>
+    <main id="main"></main>
+  </div>
+</div>
+<div id="scrim"></div>
+<aside id="drawer" aria-label="Your ticket"><h3>Your ticket</h3><div id="lines"></div>
+  <div class="recpt"><span>Wallet</span><span id="dw"></span></div><div class="recpt"><b>Total</b><b id="dt"></b></div>
+  <button class="btn" id="pay" style="margin-top:10px">Pay from wallet</button><button class="btn g" id="dx" style="margin-top:8px">Keep browsing</button></aside>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>'\u20B9'+Number(n).toFixed(2);
+const api=async(p,m='GET',b)=>{const r=await fetch('/api'+p,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Something went wrong');return d};
+const EMO={'Veg Sandwich':'🥪','Samosa':'🥟','Masala Chai':'🍵','Cold Coffee':'🧋','Veg Biryani':'🍛'},CE={Snacks:'🥨',Beverages:'🥤',Meals:'🍽️',Desserts:'🍨'};
+const COL={Snacks:'#E3A00833',Beverages:'#4C7A5133',Meals:'#B5482E33',Desserts:'#8A5BA833'};
+const NAVS={customer:[['menu','🍽️','Menu']],moderator:[['mm','🛠️','Menu']],admin:[['ov','📊','Overview'],['us','👥','Users'],['am','🍽️','Menu']]};
+let me,tab,menu=[],cart={},cat='All',roleF='',tt;
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='toast'+(bad?' bad':'');clearTimeout(tt);tt=setTimeout(()=>t.classList.add('hidden'),2600)}
+const run=async f=>{try{await f()}catch(e){toast(e.message,1)}};
+
+// login
+[['admin','rahul_admin','admin123','Dashboard, users, delete items'],['moderator','priya_mod','mod123','Add items, flip availability'],['customer','sara_cust','cust123','Order and pay by wallet']].forEach(([r,u,p,d])=>{
+ const b=document.createElement('button');b.type='button';b.className='role';b.innerHTML=`<span><b>${r}</b><br><small>${d}</small></span><small>${u}</small>`;
+ b.onclick=()=>{$('#lu').value=u;$('#lp').value=p;$('#lf').requestSubmit()};$('#roles').append(b)});
+$('#lf').onsubmit=async e=>{e.preventDefault();try{me=await api('/login','POST',{username:$('#lu').value,password:$('#lp').value});$('#le').classList.add('hidden');start()}catch(x){$('#le').textContent=x.message;$('#le').classList.remove('hidden')}};
+async function start(){$('#login').classList.add('hidden');$('#app').classList.remove('hidden');cart={};cat='All';$('#q').value='';
+ $('#who').textContent=me.username+' · '+me.role;$('#wal').classList.toggle('hidden',me.role!=='customer');$('#cb').classList.toggle('hidden',me.role!=='customer');
+ $('#nav').innerHTML='<div class="logo">CDB</div>'+NAVS[me.role].map(([k,i,l])=>`<button data-t="${k}"><i>${i}</i>${l}</button>`).join('')+'<span class="sp"></span><button id="lo"><i>🚪</i>Log out</button>';
+ $('#lo').onclick=async()=>{await api('/logout','POST');me=null;$('#app').classList.add('hidden');$('#login').classList.remove('hidden');$('#lf').reset()};
+ go(NAVS[me.role][0][0])}
+$('#nav').onclick=e=>{const b=e.target.closest('[data-t]');if(b)go(b.dataset.t)};
+$('#q').oninput=()=>run(()=>draw());
+async function go(t){tab=t;document.querySelectorAll('#nav [data-t]').forEach(b=>b.setAttribute('aria-current',b.dataset.t===t));$('#q').placeholder={menu:'Search the menu…',us:'Search users…'}[t]||'Search items…';await draw()}
+const draw=async()=>({menu:vMenu,mm:vMod,ov:vOv,us:vUsers,am:vAdminMenu})[tab]();
+const qv=()=>$('#q').value.trim().toLowerCase();
+
+// ---- customer ----
+const cnt=()=>Object.values(cart).reduce((a,b)=>a+b,0);
+function wallet(f){$('#wal').textContent='Wallet '+inr(me.profile.wallet_balance);if(f){$('#wal').classList.add('flash');setTimeout(()=>$('#wal').classList.remove('flash'),700)}}
+function stepper(i){const n=cart[i.item_id]||0;return n?`<span class="step"><button data-d="-1" data-id="${i.item_id}" aria-label="Remove one">−</button>${n}<button data-d="1" data-id="${i.item_id}" aria-label="Add one">+</button></span>`:`<button class="step add" data-d="1" data-id="${i.item_id}">Add</button>`}
+async function vMenu(){menu=await api('/menu');wallet();const cats=['All',...new Set(menu.map(i=>i.category))];
+ const list=menu.filter(i=>(cat==='All'||i.category===cat)&&(i.item_name+i.description).toLowerCase().includes(qv()));
+ $('#main').innerHTML=`<h2>Today's menu</h2><p class="sub">Only what the counter has ready right now.</p><div class="chips">${cats.map(c=>`<button class="chip" aria-pressed="${c===cat}" data-c="${c}">${c}</button>`).join('')}</div>
+ <div class="grid">${list.map(i=>`<article class="item"><div class="pic" style="--c:${COL[i.category]||'var(--bg2)'}">${EMO[i.item_name]||CE[i.category]||'🍴'}</div><div class="bd"><h3>${esc(i.item_name)}</h3><p>${esc(i.description)}</p><div class="pr"><span>${inr(i.price)}</span><span id="s${i.item_id}">${stepper(i)}</span></div></div></article>`).join('')||'<p class="sub">Nothing matches.</p>'}</div>`;
+ badge()}
+function badge(){$('#cc').textContent=cnt()}
+document.addEventListener('click',e=>{
+ const c=e.target.closest('.chip');if(c){cat=c.dataset.c;run(vMenu)}
+ const s=e.target.closest('[data-d]');if(s){const id=s.dataset.id;cart[id]=Math.max(0,(cart[id]||0)+ +s.dataset.d);if(!cart[id])delete cart[id];
+  const i=menu.find(x=>x.item_id==id),el=$('#s'+id);if(el){el.innerHTML=stepper(i);el.firstChild.classList.add('pop')}badge();if($('body').classList.contains('open'))lines()}});
+function lines(){const ids=Object.keys(cart);$('#lines').innerHTML=ids.length?ids.map(id=>{const i=menu.find(x=>x.item_id==id);return `<div class="ln"><span>${esc(i.item_name)}<br><small style="color:var(--soft)">${inr(i.price)} each</small></span>${stepper(i)}</div>`}).join(''):'<p class="sub">Add something tasty from the menu.</p>';
+ $('#dt').textContent=inr(ids.reduce((s,id)=>s+menu.find(x=>x.item_id==id).price*cart[id],0));$('#dw').textContent=inr(me.profile.wallet_balance);$('#pay').disabled=!ids.length}
+$('#cb').onclick=()=>{lines();document.body.classList.add('open')};$('#scrim').onclick=$('#dx').onclick=()=>document.body.classList.remove('open');
+$('#pay').onclick=()=>run(async()=>{const r=await api('/order','POST',{items:Object.entries(cart).map(([item_id,qty])=>({item_id:+item_id,qty}))});
+ me.profile.wallet_balance=r.new_balance;cart={};document.body.classList.remove('open');wallet(true);toast('Paid '+inr(r.total)+' — enjoy!');vMenu()});
+
+// ---- moderator ----
+async function vMod(){const m=await api('/menu?all=1');const f=m.filter(i=>(i.item_name+i.category).toLowerCase().includes(qv()));
+ $('#main').innerHTML=`<h2>Manage the menu</h2><p class="sub">${esc(me.profile.assigned_section)}</p>
+ <form class="add" id="af"><label>Item<input id="an" required></label><label>Description<input id="ad"></label><label>Price<input id="ap" type="number" step="0.01" min="0" required></label><label>Category<select id="ac"><option>Snacks</option><option>Beverages</option><option>Meals</option><option>Desserts</option></select></label><button class="btn">Add item</button></form>
+ <div class="tw"><table><thead><tr><th>Item</th><th>Category</th><th>Price (edit)</th><th>Available</th></tr></thead><tbody>${f.map(i=>`<tr><td>${esc(i.item_name)}</td><td>${esc(i.category)}</td><td><input type="number" step="0.01" min="0" value="${i.price}" data-p="${i.item_id}" aria-label="Price"></td><td><label class="sw"><input type="checkbox" data-a="${i.item_id}" ${i.is_available?'checked':''} aria-label="Available"><span></span></label></td></tr>`).join('')}</tbody></table></div>`;
+ $('#af').onsubmit=e=>{e.preventDefault();run(async()=>{await api('/menu','POST',{item_name:$('#an').value,description:$('#ad').value,price:$('#ap').value,category:$('#ac').value});toast('Item added');vMod()})}}
+document.addEventListener('change',e=>{const a=e.target.dataset;
+ if(a.a)run(async()=>{await api('/menu/'+a.a,'PUT',{is_available:e.target.checked});toast(e.target.checked?'Back on the menu':'Marked sold out')});
+ if(a.p)run(async()=>{await api('/menu/'+a.p,'PUT',{price:+e.target.value});toast('Price updated')})});
+
+// ---- admin ----
+async function vOv(){const s=await api('/summary');const k=[['Admins',s.total_admins,'admin'],['Moderators',s.total_moderators,'moderator'],['Customers',s.total_customers,'customer'],['Menu items',s.total_menu_items,''],['Available',s.available_items,'']];
+ $('#main').innerHTML=`<h2>Overview</h2><p class="sub">Live counts from the database. Tap a role to see those users.</p><div class="stats">${k.map(([l,n,r])=>`<button class="stat" data-r="${r}"><b>${n}</b><span>${l}</span></button>`).join('')}</div>`}
+$('#main').addEventListener('click',e=>{const s=e.target.closest('.stat');if(s&&s.dataset.r){roleF=s.dataset.r;go('us')}});
+async function vUsers(){const u=await api('/users');const f=u.filter(x=>(!roleF||x.role===roleF)&&(x.username+x.email).toLowerCase().includes(qv()));
+ $('#main').innerHTML=`<h2>Users</h2><div class="chips">${['','admin','moderator','customer'].map(r=>`<button class="chip" aria-pressed="${r===roleF}" data-rf="${r}">${r||'All'}</button>`).join('')}</div>
+ <div class="tw"><table><thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Detail</th></tr></thead><tbody>${f.map(x=>`<tr><td>${esc(x.username)}</td><td>${esc(x.email)}</td><td><span class="pill">${x.role}</span></td><td>${esc(x.department||x.assigned_section||(x.wallet_balance!=null?inr(x.wallet_balance)+' wallet':''))}</td></tr>`).join('')}</tbody></table></div>`}
+$('#main').addEventListener('click',e=>{const c=e.target.closest('[data-rf]');if(c){roleF=c.dataset.rf;run(vUsers)}});
+async function vAdminMenu(){const m=await api('/menu?all=1');const f=m.filter(i=>(i.item_name+i.category).toLowerCase().includes(qv()));
+ $('#main').innerHTML=`<h2>Full menu</h2><p class="sub">Delete is admin-only.</p><div class="tw"><table><thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Status</th><th>Added by</th><th></th></tr></thead><tbody>${f.map(i=>`<tr><td>${esc(i.item_name)}</td><td>${esc(i.category)}</td><td>${inr(i.price)}</td><td><span class="pill">${i.is_available?'Available':'Sold out'}</span></td><td>${esc(i.added_by_username||'—')}</td><td><button class="btn g" data-x="${i.item_id}">Delete</button></td></tr>`).join('')}</tbody></table></div>`}
+$('#main').addEventListener('click',e=>{const x=e.target.closest('[data-x]');if(x&&confirm('Delete this menu item?'))run(async()=>{await api('/menu/'+x.dataset.x,'DELETE');vAdminMenu()})});
+api('/me').then(u=>{me=u;start()}).catch(()=>{});
+</script></body></html>
